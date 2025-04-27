@@ -2,6 +2,26 @@
 
 这是一个基于人工智能的代码审查系统，包含前端和后端两个主要部分。
 
+## 如何运行
+### 前端
+创建`.env`文件，添加如下内容：
+```
+NEXT_PUBLIC_SERVER_URL_PROD=http://localhost:3000/api/v1/codeReview
+```
+表示后端的地址
+
+`npm install`
+`npm run dev`
+即可启动前端
+
+### 后端
+创建`.env`文件添加如下内容：
+```
+SERVER_PORT=3000
+ZHIPUAI_API_KEY=
+```
+这里的端口号要跟前端配置的端口号对应
+
 ## 项目结构
 
 ### 前端 (AI-Code-Review-Frontend)
