@@ -9,6 +9,9 @@ import {
     opt4Prompt
 } from "../utils/prompt.js";
 import {GoogleGenerativeAI} from "@google/generative-ai";
+import { Ollama } from "ollama";
+import { ZhipuAI } from "zhipuai-sdk-nodejs-v4";
+
 import dotenv from "dotenv";
 
 dotenv.config()
@@ -29,11 +32,41 @@ export const getResponseFromGemini = async (req, res, next) => {
         prompt += markdownPrompt
         prompt += codingOnlyPrompt
 
-        const genAI = new GoogleGenerativeAI(process.env.API_KEY || '')
-        const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"})
-        const result = await model.generateContent([prompt, code.trim()]);
-        const response = result.response;
-        const text = response.text();
+        // ChatGLM
+        const ai = new ZhipuAI();
+        const data = await ai.createCompletions({
+            model: "glm-4-flash",
+            messages: [
+                {
+                    role: "user",
+                    content: prompt
+                },
+                {
+                    role: "user",
+                    content: code.trim()
+                }
+            ],
+            stream: false
+        });
+        console.log(data.choices[0].message.content)
+        const text = data.choices[0].message.content;
+        
+        // Ollama
+        // const ollama = new Ollama({host: "http://localhost:11434"});
+        // const result = await ollama.chat({
+        //     model: "llama3.1:8b",
+        //     messages: [{role: "user", content: prompt},
+        //         {role: "user", content: code.trim()}
+        //      ]
+        // });
+        // console.log(result.response.text())
+        
+        // Gemini
+        // const genAI = new GoogleGenerativeAI(process.env.API_KEY || '')
+        // const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"})
+        // const result = await model.generateContent([prompt, code.trim()]);
+        // const response = result.response;
+        // const text = response.text();
 
         return res.status(200).json({response: text, success: true})
     } catch (e) {
